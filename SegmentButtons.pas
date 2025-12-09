@@ -49,6 +49,14 @@ type
     FItemIndex: integer;
     FThumbPos: single;
     FOnSelectSegment: TSelectSegmentEvent;
+    FCornerRadius: Single;
+    FBackStrokeColor: TAlphaColor;
+    FThumbColor: TAlphaColor;
+    FBackFillColor: TAlphaColor;
+    FThumbTextColor: TAlphaColor;
+    FBackTextColor: TAlphaColor;
+    FXInset: Single;
+    FYInset: Single;
     procedure SetSegments(const Value: TStrings);
     procedure SetItemIndex(Value: integer);
 
@@ -65,7 +73,14 @@ type
     property Segments: TStrings read FSegments write SetSegments;
     property ItemIndex: integer read FItemIndex write SetItemIndex default -1;
     property OnSelectSegment: TSelectSegmentEvent read FOnSelectSegment write FOnSelectSegment;
-
+    property CornerRadius: Single read FCornerRadius write FCornerRadius;
+    property BackFillColor: TAlphaColor read FBackFillColor write FBackFillColor;
+    property BackStrokeColor: TAlphaColor read FBackStrokeColor write FBackStrokeColor;
+    property BackTextColor: TAlphaColor read FBackTextColor write FBackTextColor;
+    property ThumbColor: TAlphaColor read FThumbColor write FThumbColor;
+    property ThumbTextColor: TAlphaColor read FThumbTextColor write FThumbTextColor;
+    property XInset: Single read FXInset write FXInset;
+    property YInset: Single read FYInset write FYInset;
   end;
 
   procedure Register;
@@ -93,6 +108,14 @@ begin
   FSegments := TStringList.Create;
   FThumbPos := 0;
   FItemIndex := -1;
+  FCornerRadius := 16;
+  FXInset:=8;
+  FYInset:=8;
+  FBackStrokeColor:=claGainsboro;
+  FBackFillColor:=claGainsboro;
+  FThumbColor:=claWhite;
+  FThumbTextColor:=claBlack;
+  FBackTextColor:=claBlack;
   Width := 200;
   Height := 56;
   SetAcceptsControls(False);
@@ -126,6 +149,7 @@ var
   AIndex: integer;
   AStr: string;
   AThumbRect: TRectF;
+  ACornerRadius: Single;
 begin
   inherited;
   AState := Canvas.SaveState;
@@ -133,7 +157,7 @@ begin
     Canvas.IntersectClipRect(ClipRect);
 
     AThumbRect := ClipRect;
-    AThumbRect.Inflate(-8, -8);
+    AThumbRect.Inflate(-FXInset, -FYInset);
 
     if FSegments.Count = 0 then
       FItemIndex := -1
@@ -143,30 +167,35 @@ begin
         FItemIndex := 0;
     end;
 
+    if FCornerRadius < 0 then
+      ACornerRadius := (ClipRect.Height - (FYInset * 2)) / 2
+    else
+      ACornerRadius := FCornerRadius;
+
     ARect := AThumbRect;
     Canvas.Fill.Kind := TBrushKind.Solid;
     Canvas.Fill.Color := claBlack;
     Canvas.Stroke.Kind := TBrushKind.Solid;
-    Canvas.Stroke.Color := claGainsboro;
+    Canvas.Stroke.Color := FBackStrokeColor;
     Canvas.Stroke.Thickness := 5;
-    Canvas.Fill.Color := claGainsboro;
+    Canvas.Fill.Color := FBackFillColor;
     //Canvas.Stroke.Thickness := 4;
-    Canvas.DrawRect(ARect, 16, 16, AllCorners, 1);
-    Canvas.FillRect(ARect, 16, 16, AllCorners, 1);
+    Canvas.DrawRect(ARect, ACornerRadius, ACornerRadius, AllCorners, 1);
+    Canvas.FillRect(ARect, ACornerRadius, ACornerRadius, AllCorners, 1);
 
     FButtonWidth := ARect.Width / FSegments.Count;
 
 
     ARect.Width := FButtonWidth;
     Canvas.Stroke.Kind := TBrushKind.Solid;
-    Canvas.Fill.Color := claWhite;
+    Canvas.Fill.Color := FThumbColor;
     Canvas.Stroke.Thickness := 0;
 
     // thumb...
-    Canvas.Fill.Color := claWhite;
+    Canvas.Fill.Color := FThumbColor;
     AThumbRect := ARect;
     AThumbRect.Offset(FThumbPos, 0);
-    Canvas.FillRect(AThumbRect, 16, 16, AllCorners, 1);
+    Canvas.FillRect(AThumbRect, ACornerRadius, ACornerRadius, AllCorners, 1);
 
 
 
@@ -176,17 +205,17 @@ begin
 
       if AIndex = FItemIndex then
       begin
-        Canvas.font.Style := [TFontStyle.fsBold];
-        Canvas.Fill.Color := claBlack;
+        Canvas.Font.Style := [TFontStyle.fsBold];
+        Canvas.Fill.Color := FThumbTextColor;
       end
       else
       begin
         Canvas.Font.Style := [];
-        Canvas.Fill.Color := claSilver;
+        Canvas.Fill.Color := FBackTextColor;
       end;
 
       //Canvas.FillRect(ARect, 16, 16, AllCorners, 1);
-      Canvas.Fill.Color := claBlack;
+//      Canvas.Fill.Color := FBackTextColor;
       Canvas.Font.Size := 15;
       Canvas.FillText(ARect, AStr, False, 1, [], TTextAlign.Center, TTextAlign.Center);
       ARect.Offset(FButtonWidth, 0);
@@ -216,7 +245,7 @@ begin
 
     // FIX HERE
     if FButtonWidth = 0 then
-      FButtonWidth:=(Self.Width - 16) / FSegments.Count; //approximate for now if not already set
+      FButtonWidth:=(Self.Width - FCornerRadius) / FSegments.Count; //approximate for now if not already set
 
     bw := FButtonWidth;
     if csDesigning in ComponentState then
