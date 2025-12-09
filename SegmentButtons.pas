@@ -214,7 +214,9 @@ begin
   begin
     FItemIndex := Value;
 
-
+    // FIX HERE
+    if FButtonWidth = 0 then
+      FButtonWidth:=(Self.Width - 16) / FSegments.Count; //approximate for now if not already set
 
     bw := FButtonWidth;
     if csDesigning in ComponentState then

@@ -962,7 +962,7 @@ begin
   FAniCalc.UpdatePosImmediately;
   FAniCalc.Animation := True;
   FAniCalc.Averaging := True;
-  FAniCalc.Interval := 8;
+  //FAniCalc.Interval := 8;
   FAniCalc.BoundsAnimation := True;
   FAniCalc.TouchTracking := [ttVertical];
   FAniCalc.OnChanged := AniCalcChange;
