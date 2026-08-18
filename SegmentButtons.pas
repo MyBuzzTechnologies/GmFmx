@@ -65,6 +65,7 @@ type
   protected
     procedure Paint; override;
     procedure Click; override;
+    procedure DoResized; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -130,6 +131,16 @@ destructor TSegmentButtons.Destroy;
 begin
   FSegments.Free;
   inherited;
+end;
+
+procedure TSegmentButtons.DoResized;
+begin
+  inherited;
+  if FSegments.Count > 0 then
+  begin
+    FButtonWidth:=(Self.Width - FCornerRadius) / FSegments.Count; //approximate for now if not already set
+    ThumbPos := FItemIndex * FButtonWidth;
+  end;
 end;
 
 procedure TSegmentButtons.Initialise(aSegmentIndex: Integer);
