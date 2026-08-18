@@ -57,6 +57,7 @@ type
     FBackTextColor: TAlphaColor;
     FXInset: Single;
     FYInset: Single;
+
     procedure SetSegments(const Value: TStrings);
     procedure SetItemIndex(Value: integer);
 
@@ -68,6 +69,10 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    ///<summary>Sets the control up (via code) with no animations for a better UX</summary>
+    procedure Initialise(aSegmentIndex: Integer);
+
     property ThumbPos: single read FThumbPos write SetThumbPos;
   published
     property Segments: TStrings read FSegments write SetSegments;
@@ -125,6 +130,32 @@ destructor TSegmentButtons.Destroy;
 begin
   FSegments.Free;
   inherited;
+end;
+
+procedure TSegmentButtons.Initialise(aSegmentIndex: Integer);
+var
+  bw: single;
+begin
+  if aSegmentIndex > FSegments.Count-1 then
+    aSegmentIndex := FSegments.Count-1;
+
+  if (aSegmentIndex < 0) and (FSegments.Count > 0) then
+    aSegmentIndex := 0;
+
+
+  if FItemIndex <> aSegmentIndex then
+  begin
+    FItemIndex := aSegmentIndex;
+
+    if FButtonWidth = 0 then
+      FButtonWidth:=(Self.Width - FCornerRadius) / FSegments.Count; //approximate for now if not already set
+
+    bw := FButtonWidth;
+    ThumbPos := FItemIndex * bw;
+
+    if Assigned(FOnSelectSegment) then
+      FOnSelectSegment(Self, FItemIndex);
+  end;
 end;
 
 procedure TSegmentButtons.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -235,7 +266,7 @@ var
   bw: single;
 begin
   if Value > FSegments.Count-1 then Value := FSegments.Count-1;
-  
+
   if (Value < 0) and (FSegments.Count > 0) then Value := 0;
 
 
