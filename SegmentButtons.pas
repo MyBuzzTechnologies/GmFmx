@@ -57,6 +57,8 @@ type
     FBackTextColor: TAlphaColor;
     FXInset: Single;
     FYInset: Single;
+    FThumbTextBold: Boolean;
+    FThumbFontSize: Single;
 
     procedure SetSegments(const Value: TStrings);
     procedure SetItemIndex(Value: integer);
@@ -85,6 +87,8 @@ type
     property BackTextColor: TAlphaColor read FBackTextColor write FBackTextColor;
     property ThumbColor: TAlphaColor read FThumbColor write FThumbColor;
     property ThumbTextColor: TAlphaColor read FThumbTextColor write FThumbTextColor;
+    property ThumbTextBold: Boolean read FThumbTextBold write FThumbTextBold;
+    property ThumbFontSize: Single read FThumbFontSize write FThumbFontSize;
     property XInset: Single read FXInset write FXInset;
     property YInset: Single read FYInset write FYInset;
   end;
@@ -122,6 +126,8 @@ begin
   FThumbColor:=claWhite;
   FThumbTextColor:=claBlack;
   FBackTextColor:=claBlack;
+  FThumbTextBold:=True;
+  FThumbFontSize:=15;
   Width := 200;
   Height := 56;
   SetAcceptsControls(False);
@@ -239,15 +245,16 @@ begin
     AThumbRect.Offset(FThumbPos, 0);
     Canvas.FillRect(AThumbRect, ACornerRadius, ACornerRadius, AllCorners, 1);
 
-
-
     for AIndex := 0 to FSegments.Count-1 do
     begin
       AStr := FSegments[AIndex];
 
       if AIndex = FItemIndex then
       begin
-        Canvas.Font.Style := [TFontStyle.fsBold];
+        if FThumbTextBold then
+          Canvas.Font.Style := [TFontStyle.fsBold]
+        else
+          Canvas.Font.Style := [];
         Canvas.Fill.Color := FThumbTextColor;
       end
       else
@@ -258,7 +265,7 @@ begin
 
       //Canvas.FillRect(ARect, 16, 16, AllCorners, 1);
 //      Canvas.Fill.Color := FBackTextColor;
-      Canvas.Font.Size := 15;
+      Canvas.Font.Size := FThumbFontSize;
       Canvas.FillText(ARect, AStr, False, 1, [], TTextAlign.Center, TTextAlign.Center);
       ARect.Offset(FButtonWidth, 0);
     end;

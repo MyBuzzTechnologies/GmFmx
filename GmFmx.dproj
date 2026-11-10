@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{CFE9EEA1-FB7C-4D7E-9240-4B915A11DA24}</ProjectGuid>
         <MainSource>GmFmx.dpk</MainSource>
-        <ProjectVersion>20.4</ProjectVersion>
+        <ProjectVersion>20.5</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
